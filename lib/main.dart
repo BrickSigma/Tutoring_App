@@ -11,12 +11,18 @@ void main() async {
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
+
+  // Start the app.
   runApp(const App());
 }
 
+/// Main entry point to the app.
+/// 
+/// Loads the app data from disk before starting the UI (`/views/navigator_page.dart`)
 class App extends StatefulWidget {
   const App({super.key});
 
+  /// Used to restart the app programatically.
   static void restartApp(BuildContext context) {
     context.findAncestorStateOfType<_AppState>()!.restartApp();
   }
@@ -29,6 +35,7 @@ class _AppState extends State<App> {
   /// Controller for the main app.
   MainController controller = MainController.instance;
 
+  /// Used for handling the app restart.
   Key key = UniqueKey();
 
   /// Theme mode settings
@@ -47,6 +54,7 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
+    // Function used to load data from the disk/main controller.
     Future<int> loadData = Future<int>.delayed(
       Duration.zero,
       () async => await controller.loadData(),
@@ -61,16 +69,20 @@ class _AppState extends State<App> {
         theme: lightTheme,
         darkTheme: darkTheme,
         themeMode: _themeModes[controller.themeMode],
+        // Using a FutureBuilder to load data from disk before starting the main UI.
         home: FutureBuilder<int>(
           future: loadData,
           builder: (context, snapshot) {
             Widget child;
             if (snapshot.hasData) {
+              // Load the navigator page once the app data is loaded.
               child = const NavigatorPage();
             } else if (snapshot.hasError) {
+              // If there was an error in loading the app data, show an error screen.
               child =
                   const Center(child: Text("ERROR: Could not load app data!"));
             } else {
+              // Show a loading screen as the data is being loaded.
               child = const Center(
                 child: SizedBox(
                     width: 100,

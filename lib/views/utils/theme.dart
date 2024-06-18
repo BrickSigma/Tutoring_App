@@ -10,16 +10,8 @@ const List<ThemeMode> themeModes = [
   ThemeMode.dark,
 ];
 
-const Color white = Color.fromARGB(255, 245, 245, 245);
-const Color black = Color.fromARGB(255, 40, 40, 40);
-
-const Color backgroundLightColor = white;
-const Color primaryLightColor = Color.fromARGB(255, 136, 187, 218);
-const Color accentLightColor = Color.fromARGB(255, 21, 47, 97);
-
-const Color backgroundDarkColor = Color.fromARGB(255, 60, 65, 66);
-const Color primaryDarkColor = Color.fromARGB(255, 0, 128, 128);
-const Color accentDarkColor = Color.fromARGB(255, 91, 124, 153);
+/// Font sizes.
+/// =====================================
 
 const double bodySmallSize = 16;
 const double bodyMediumSize = 18;
@@ -27,6 +19,8 @@ const double bodyLargeSize = 21;
 const double headlineSmallSize = 18;
 const double headlineMediumSize = 21;
 const double headlineLargeSize = 24;
+
+/// =====================================
 
 /// Light mode color scheme.
 ColorScheme lightColorScheme = ColorScheme(

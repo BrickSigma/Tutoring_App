@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class MainController extends ChangeNotifier {
   MainController._privateConstructor();
 
+  // Singleton instance of the main controller class.
   static final MainController _instance = MainController._privateConstructor();
 
   static MainController get instance => _instance;
