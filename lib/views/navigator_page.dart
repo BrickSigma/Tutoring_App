@@ -2,6 +2,8 @@
 /// pages/views.
 library;
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tutoring_app/views/forgot_password/forgot_password.dart';
@@ -20,8 +22,29 @@ class _NavigatorPageState extends State<NavigatorPage> {
   /// Selected page from the navigation bar.
   final ValueNotifier<int> _pageIndex = ValueNotifier(0);
 
+  /// Check if the user is already signed into the app.
+  void setup() async {
+    FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+      if (user == null) {
+        _pageIndex.value = Login.index;
+      } else {
+        final snapshot =
+            await FirebaseDatabase.instance.ref("users/${user.uid}").get();
+        if (snapshot.exists) {
+          if ((snapshot.value as Map)["tutor"]) {
+            _pageIndex.value = 3;
+          } else {
+            _pageIndex.value = 4;
+          }
+        }
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    setup();
+
     /// List of all pages.
     final List<Widget> pages = <Widget>[
       Login(pageIndex: _pageIndex), // Login

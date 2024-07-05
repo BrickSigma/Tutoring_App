@@ -1,3 +1,6 @@
+import 'package:email_validator/email_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 class Register extends StatefulWidget {
@@ -22,6 +25,31 @@ class _RegisterState extends State<Register> {
   final passwordConfirmController = TextEditingController();
 
   bool isTutor = false;
+
+  void registerUser() async {
+    if (emailController.text.isNotEmpty &&
+        passwordController.text.isNotEmpty &&
+        passwordConfirmController.text.isNotEmpty &&
+        usernameController.text.isNotEmpty &&
+        passwordController.text == passwordConfirmController.text &&
+        EmailValidator.validate(emailController.text)) {
+      try {
+        UserCredential user = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(
+                email: emailController.text, password: passwordController.text);
+        await FirebaseDatabase.instance.ref().update({
+          "users/${user.user!.uid}": {
+            "name": usernameController.text,
+            "tutor": isTutor
+          }
+        });
+      } on FirebaseAuthException catch (e) {
+        print(e.code);
+      }
+    } else {
+      print("Invalid credentials!");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,20 +90,25 @@ class _RegisterState extends State<Register> {
               obscureText: true,
             ),
             const SizedBox(height: 25),
-            Row(
-              children: [
-                Checkbox(
-                  value: isTutor,
-                  onChanged: (value) => setState(() {
-                    isTutor = value ?? false;
-                  }),
-                ),
-                const Text("Are you a tutor?"),
-              ],
+            GestureDetector(
+              onTap: () => setState(() {
+                isTutor = !isTutor;
+              }),
+              child: Row(
+                children: [
+                  Checkbox(
+                    value: isTutor,
+                    onChanged: (value) => setState(() {
+                      isTutor = value ?? false;
+                    }),
+                  ),
+                  const Text("Are you a tutor?"),
+                ],
+              ),
             ),
             const SizedBox(height: 25),
             GestureDetector(
-              onTap: () {},
+              onTap: registerUser,
               child: Container(
                 padding: const EdgeInsets.all(25),
                 decoration: BoxDecoration(

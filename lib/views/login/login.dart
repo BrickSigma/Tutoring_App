@@ -1,3 +1,5 @@
+import 'package:email_validator/email_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tutoring_app/views/forgot_password/forgot_password.dart';
 import 'package:tutoring_app/views/register/register.dart';
@@ -9,8 +11,23 @@ class Login extends StatelessWidget {
 
   static const int index = 0;
 
-  final usernamecontroller = TextEditingController();
+  final emailController = TextEditingController();
   final passwordController = TextEditingController();
+
+  void login() async {
+    try {
+      if (emailController.text.isNotEmpty &&
+          passwordController.text.isNotEmpty &&
+          EmailValidator.validate(emailController.text)) {
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+            email: emailController.text, password: passwordController.text);
+      } else {
+        print("Invalid email!");
+      }
+    } on FirebaseAuthException catch (e) {
+      print("AUTH ERROR: ${e.code}");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +46,7 @@ class Login extends StatelessWidget {
             const Text("Welcome"),
             const SizedBox(height: 25),
             TextField(
-              controller: usernamecontroller,
+              controller: emailController,
               decoration: const InputDecoration(hintText: "Username"),
             ),
             const SizedBox(height: 10),
@@ -52,7 +69,7 @@ class Login extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             GestureDetector(
-              onTap: () {},
+              onTap: login,
               child: Container(
                 padding: const EdgeInsets.all(25),
                 decoration: BoxDecoration(
