@@ -4,9 +4,6 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:tutoring_app/views/forgot_password/forgot_password.dart';
-import 'package:tutoring_app/views/login/login.dart';
-import 'package:tutoring_app/views/register/register.dart';
 
 /// Main navigator between app pages (home, todo list, timetable)
 class NavigatorPage extends StatefulWidget {
@@ -18,17 +15,17 @@ class NavigatorPage extends StatefulWidget {
 
 class _NavigatorPageState extends State<NavigatorPage> {
   /// Selected page from the navigation bar.
-  final ValueNotifier<int> _pageIndex = ValueNotifier(0);
+  int _pageIndex = 1;
 
   @override
   Widget build(BuildContext context) {
     /// List of all pages.
+    /// TODO: When you have completed your page add it into this list of pages.
+    /// Currently has empty containers to fill.
     final List<Widget> pages = <Widget>[
-      Login(pageIndex: _pageIndex), // Login
-      Register(pageIndex: _pageIndex), // Register
-      ForgotPassword(pageIndex: _pageIndex), // Forgot password
-      Container(color: Colors.amber), // Tutor
-      Container(color: Colors.pink), // Student
+      Container(color: Colors.red),
+      Container(color: Colors.green),
+      Container(color: Colors.blue),
     ];
 
     // Colors used for system UI.
@@ -51,9 +48,35 @@ class _NavigatorPageState extends State<NavigatorPage> {
       ),
 
       // Main app UI entry point.
-      child: ListenableBuilder(
-        listenable: _pageIndex,
-        builder: (context, child) => pages[_pageIndex.value],
+      child: Scaffold(
+        body: pages[_pageIndex],
+        // Navigation bar used to switch between the pages.
+        bottomNavigationBar: NavigationBar(
+          height: 64,
+          indicatorColor: Theme.of(context).colorScheme.secondary,
+          backgroundColor: navColor,
+          selectedIndex: _pageIndex,
+          // Set the page index when a navigation item is selected.
+          onDestinationSelected: (index) => setState(() {
+            _pageIndex = index;
+          }),
+          labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+          // List of pages/tabs.
+          destinations: const <Widget>[
+            NavigationDestination(
+              icon: Icon(Icons.list),
+              label: "Todo",
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.home),
+              label: "Home",
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.calendar_month),
+              label: "Timetable",
+            ),
+          ],
+        ),
       ),
     );
   }

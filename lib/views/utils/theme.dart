@@ -71,6 +71,19 @@ ThemeData lightTheme = ThemeData(
   ),
   floatingActionButtonTheme:
       const FloatingActionButtonThemeData(shape: CircleBorder()),
+  inputDecorationTheme: InputDecorationTheme(
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: BorderSide(color: lightColorScheme.onPrimary),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: BorderSide(color: lightColorScheme.primary),
+    ),
+    fillColor: lightColorScheme.secondaryContainer,
+    filled: true,
+    hintStyle: TextStyle(color: lightColorScheme.onSecondaryContainer),
+  ),
 );
 
 /// Dark mode color scheme.
@@ -122,5 +135,18 @@ ThemeData darkTheme = ThemeData(
   ),
   floatingActionButtonTheme: const FloatingActionButtonThemeData(
     shape: CircleBorder(),
+  ),
+  inputDecorationTheme: InputDecorationTheme(
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: BorderSide(color: darkColorScheme.onPrimary),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: BorderSide(color: darkColorScheme.primary),
+    ),
+    fillColor: darkColorScheme.secondaryContainer,
+    filled: true,
+    hintStyle: TextStyle(color: darkColorScheme.onSecondaryContainer),
   ),
 );
