@@ -1,11 +1,24 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tutoring_app/controllers/main_controller.dart';
+import 'package:tutoring_app/firebase_options.dart';
 import 'package:tutoring_app/views/navigator_page.dart';
 import 'package:tutoring_app/views/utils/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  FirebaseAuth.instance.authStateChanges().listen((User? user) {
+    if (user == null) {
+      print('User is currently signed out!');
+    } else {
+      print('User is signed in!');
+    }
+  });
 
   // Disable screen rotation.
   SystemChrome.setPreferredOrientations([
@@ -17,7 +30,7 @@ void main() async {
 }
 
 /// Main entry point to the app.
-/// 
+///
 /// Loads the app data from disk before starting the UI (`/views/navigator_page.dart`)
 class App extends StatefulWidget {
   const App({super.key});
