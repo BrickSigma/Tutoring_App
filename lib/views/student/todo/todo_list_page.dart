@@ -40,32 +40,33 @@ class ToDoListPageState extends State<ToDoListPage> {
             ),
           ),
           ListenableBuilder(
-              listenable: controller,
-              builder: (context, child) {
-                return Expanded(
-                  child: ListView.builder(
-                    itemCount: controller.tasks.length,
-                    itemBuilder: (context, index) {
-                      final task = controller.tasks[index];
-                      return ListTile(
-                        title: Text(
-                          task['task'],
-                          style: TextStyle(
-                            decoration: task['completed']
-                                ? TextDecoration.lineThrough
-                                : TextDecoration.none,
-                          ),
+            listenable: controller,
+            builder: (context, child) {
+              return Expanded(
+                child: ListView.builder(
+                  itemCount: controller.tasks.length,
+                  itemBuilder: (context, index) {
+                    final task = controller.tasks[index];
+                    return ListTile(
+                      title: Text(
+                        task['task'],
+                        style: TextStyle(
+                          decoration: task['completed']
+                              ? TextDecoration.lineThrough
+                              : TextDecoration.none,
                         ),
-                        leading: Checkbox(
-                          value: task['completed'],
-                          onChanged: (_) =>
-                              controller.toggleTaskCompletion(index),
-                        ),
-                      );
-                    },
-                  ),
-                );
-              }),
+                      ),
+                      leading: Checkbox(
+                        value: task['completed'],
+                        onChanged: (_) =>
+                            controller.toggleTaskCompletion(index),
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+          ),
         ],
       ),
     );
