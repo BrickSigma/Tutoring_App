@@ -16,6 +16,8 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
+  final _formKey = GlobalKey<FormState>();
+
   final usernameController = TextEditingController();
 
   final emailController = TextEditingController();
@@ -26,13 +28,8 @@ class _RegisterState extends State<Register> {
 
   bool isTutor = false;
 
-  void registerUser() async {
-    if (emailController.text.isNotEmpty &&
-        passwordController.text.isNotEmpty &&
-        passwordConfirmController.text.isNotEmpty &&
-        usernameController.text.isNotEmpty &&
-        passwordController.text == passwordConfirmController.text &&
-        EmailValidator.validate(emailController.text)) {
+  void registerUser(BuildContext context) async {
+    if (_formKey.currentState!.validate()) {
       try {
         UserCredential user = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(
@@ -43,11 +40,56 @@ class _RegisterState extends State<Register> {
             "tutor": isTutor
           }
         });
+        if (context.mounted) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text("User created!"),
+              content: const Text("Go back to login..."),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Okay"),
+                ),
+              ],
+            ),
+          );
+        }
       } on FirebaseAuthException catch (e) {
-        print(e.code);
+        if (context.mounted) {
+          String errorCode = "";
+          switch (e.code) {
+            case "email-already-in-use":
+              errorCode = "Email already in use";
+              break;
+            case "operation-not-allowed":
+              errorCode = "Operation not allowed";
+              break;
+            case "weak-password":
+              errorCode = "Weak password";
+              break;
+            case "invalid-email":
+              errorCode = "Invalid email";
+              break;
+            case "invalid-credential":
+              errorCode = "Invalid credential";
+              break;
+          }
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text("Could Create New Account!"),
+              content: Text(errorCode),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Okay"),
+                ),
+              ],
+            ),
+          );
+        }
       }
-    } else {
-      print("Invalid credentials!");
     }
   }
 
@@ -64,67 +106,100 @@ class _RegisterState extends State<Register> {
       ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(25, 0, 25, 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: usernameController,
-              decoration: const InputDecoration(hintText: "Full Name"),
-            ),
-            const SizedBox(height: 25),
-            TextField(
-              controller: emailController,
-              decoration: const InputDecoration(hintText: "Email"),
-            ),
-            const SizedBox(height: 25),
-            TextField(
-              controller: passwordController,
-              decoration: const InputDecoration(hintText: "Password"),
-              obscureText: true,
-            ),
-            const SizedBox(height: 25),
-            TextField(
-              controller: passwordConfirmController,
-              decoration: const InputDecoration(hintText: "Confirm Password"),
-              obscureText: true,
-            ),
-            const SizedBox(height: 25),
-            GestureDetector(
-              onTap: () => setState(() {
-                isTutor = !isTutor;
-              }),
-              child: Row(
-                children: [
-                  Checkbox(
-                    value: isTutor,
-                    onChanged: (value) => setState(() {
-                      isTutor = value ?? false;
-                    }),
-                  ),
-                  const Text("Are you a tutor?"),
-                ],
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextFormField(
+                controller: usernameController,
+                decoration: const InputDecoration(hintText: "Full Name"),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Required field!";
+                  }
+                  return null;
+                },
               ),
-            ),
-            const SizedBox(height: 25),
-            GestureDetector(
-              onTap: registerUser,
-              child: Container(
-                padding: const EdgeInsets.all(25),
-                decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary,
-                    borderRadius: BorderRadius.circular(8)),
-                child: Center(
-                  child: Text(
-                    "Sign Up",
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onPrimary,
+              const SizedBox(height: 25),
+              TextFormField(
+                controller: emailController,
+                decoration: const InputDecoration(hintText: "Email"),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Required field!";
+                  } else if (!EmailValidator.validate(value)) {
+                    return "Invalid email!";
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 25),
+              TextFormField(
+                controller: passwordController,
+                decoration: const InputDecoration(hintText: "Password"),
+                obscureText: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Required field!";
+                  } else if (value.length < 6) {
+                    return "Must be more than 6 letters";
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 25),
+              TextFormField(
+                controller: passwordConfirmController,
+                decoration: const InputDecoration(hintText: "Confirm Password"),
+                obscureText: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Required field!";
+                  } else if (value != passwordController.text) {
+                    return "Passwords do not match!";
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 25),
+              GestureDetector(
+                onTap: () => setState(() {
+                  isTutor = !isTutor;
+                }),
+                child: Row(
+                  children: [
+                    Checkbox(
+                      value: isTutor,
+                      onChanged: (value) => setState(() {
+                        isTutor = value ?? false;
+                      }),
+                    ),
+                    const Text("Are you a tutor?"),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 25),
+              GestureDetector(
+                onTap: () => registerUser(context),
+                child: Container(
+                  padding: const EdgeInsets.all(25),
+                  decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                      borderRadius: BorderRadius.circular(8)),
+                  child: Center(
+                    child: Text(
+                      "Sign Up",
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

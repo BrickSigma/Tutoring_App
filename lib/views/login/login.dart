@@ -1,31 +1,73 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:tutoring_app/views/forgot_password/forgot_password.dart';
 import 'package:tutoring_app/views/register/register.dart';
 
-class Login extends StatelessWidget {
-  Login({required ValueNotifier pageIndex, super.key}) : _pageIndex = pageIndex;
+class Login extends StatefulWidget {
+  const Login({required ValueNotifier pageIndex, super.key})
+      : _pageIndex = pageIndex;
 
   final ValueNotifier _pageIndex;
 
   static const int index = 0;
 
+  @override
+  State<Login> createState() => _LoginState();
+}
+
+class _LoginState extends State<Login> {
+  final _formKey = GlobalKey<FormState>();
+
   final emailController = TextEditingController();
+
   final passwordController = TextEditingController();
 
-  void login() async {
+  void login(BuildContext context) async {
     try {
-      if (emailController.text.isNotEmpty &&
-          passwordController.text.isNotEmpty &&
-          EmailValidator.validate(emailController.text)) {
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
-            email: emailController.text, password: passwordController.text);
-      } else {
-        print("Invalid email!");
+      if (_formKey.currentState!.validate()) {
+        UserCredential credentials = await FirebaseAuth.instance
+            .signInWithEmailAndPassword(
+                email: emailController.text, password: passwordController.text);
+        FirebaseDatabase.instance
+            .ref("users/${credentials.user!.uid}")
+            .keepSynced(true);
       }
     } on FirebaseAuthException catch (e) {
-      print("AUTH ERROR: ${e.code}");
+      if (context.mounted) {
+        String errorCode = "";
+        switch (e.code) {
+          case "user-disabled":
+            errorCode = "User disabled";
+            break;
+          case "user-not-found":
+            errorCode = "User not found";
+            break;
+          case "wrong-password":
+            errorCode = "Wrong password";
+            break;
+          case "invalid-email":
+            errorCode = "Invalid email";
+            break;
+          case "invalid-credential":
+            errorCode = "Invalid credential";
+            break;
+        }
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Could Not Login!"),
+            content: Text(errorCode),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Okay"),
+              ),
+            ],
+          ),
+        );
+      }
     }
   }
 
@@ -34,64 +76,82 @@ class Login extends StatelessWidget {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.fromLTRB(25, 0, 25, 0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.lock_person,
-              size: 100,
-            ),
-            const SizedBox(height: 50),
-            const Text("Welcome"),
-            const SizedBox(height: 25),
-            TextField(
-              controller: emailController,
-              decoration: const InputDecoration(hintText: "Username"),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: passwordController,
-              decoration: const InputDecoration(hintText: "Password"),
-              obscureText: true,
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                GestureDetector(
-                  onTap: () => _pageIndex.value = ForgotPassword.index,
-                  child: const Text(
-                    "Forgot Password?",
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.lock_person,
+                size: 100,
+              ),
+              const SizedBox(height: 50),
+              const Text("Welcome"),
+              const SizedBox(height: 25),
+              TextFormField(
+                controller: emailController,
+                decoration: const InputDecoration(hintText: "Email"),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "No email entered!";
+                  } else if (!EmailValidator.validate(value)) {
+                    return "Invalid email!";
+                  } else {
+                    return null;
+                  }
+                },
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: passwordController,
+                decoration: const InputDecoration(hintText: "Password"),
+                obscureText: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "No password enetered!";
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  GestureDetector(
+                    onTap: () => widget._pageIndex.value = ForgotPassword.index,
+                    child: const Text(
+                      "Forgot Password?",
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            GestureDetector(
-              onTap: login,
-              child: Container(
-                padding: const EdgeInsets.all(25),
-                decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary,
-                    borderRadius: BorderRadius.circular(8)),
-                child: Center(
-                  child: Text(
-                    "Log in",
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.onPrimary),
+                ],
+              ),
+              const SizedBox(height: 20),
+              GestureDetector(
+                onTap: () => login(context),
+                child: Container(
+                  padding: const EdgeInsets.all(25),
+                  decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                      borderRadius: BorderRadius.circular(8)),
+                  child: Center(
+                    child: Text(
+                      "Log in",
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onPrimary),
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            GestureDetector(
-              onTap: () => _pageIndex.value = Register.index,
-              child: const Text(
-                "Don't have an account ?",
+              const SizedBox(height: 20),
+              GestureDetector(
+                onTap: () => widget._pageIndex.value = Register.index,
+                child: const Text(
+                  "Don't have an account ?",
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

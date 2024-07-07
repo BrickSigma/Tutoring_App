@@ -6,21 +6,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 /// Main navigator between app pages (home, todo list, timetable)
-class NavigatorPage extends StatefulWidget {
-  const NavigatorPage({super.key});
+class TutorPage extends StatefulWidget {
+  const TutorPage({super.key});
 
   @override
-  State<NavigatorPage> createState() => _NavigatorPageState();
+  State<TutorPage> createState() => _TutorPageState();
 }
 
-class _NavigatorPageState extends State<NavigatorPage> {
+class _TutorPageState extends State<TutorPage> {
   /// Selected page from the navigation bar.
   int _pageIndex = 1;
 
   @override
   Widget build(BuildContext context) {
     /// List of all pages.
-    /// TODO: When you have completed your page add it into this list of pages.
     /// Currently has empty containers to fill.
     final List<Widget> pages = <Widget>[
       Container(color: Colors.red),
@@ -64,8 +63,8 @@ class _NavigatorPageState extends State<NavigatorPage> {
           // List of pages/tabs.
           destinations: const <Widget>[
             NavigationDestination(
-              icon: Icon(Icons.list),
-              label: "Todo",
+              icon: Icon(Icons.people),
+              label: "Students",
             ),
             NavigationDestination(
               icon: Icon(Icons.home),

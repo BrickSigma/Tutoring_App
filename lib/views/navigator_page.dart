@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:tutoring_app/views/forgot_password/forgot_password.dart';
 import 'package:tutoring_app/views/login/login.dart';
 import 'package:tutoring_app/views/register/register.dart';
+import 'package:tutoring_app/views/student/student_page.dart';
 
 /// Main navigator between app pages (home, todo list, timetable)
 class NavigatorPage extends StatefulWidget {
@@ -51,7 +52,7 @@ class _NavigatorPageState extends State<NavigatorPage> {
       Register(pageIndex: _pageIndex), // Register
       ForgotPassword(pageIndex: _pageIndex), // Forgot password
       Container(color: Colors.amber), // Tutor
-      Container(color: Colors.pink), // Student
+      const StudentPage(), // Student
     ];
 
     // Colors used for system UI.
