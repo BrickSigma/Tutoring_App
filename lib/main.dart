@@ -83,7 +83,7 @@ class _AppState extends State<App> {
             Widget child;
             if (snapshot.hasData) {
               // Load the navigator page once the app data is loaded.
-              child = const NavigatorPage();
+              child = NavigatorPage(MainController.instance.pageIndex);
             } else if (snapshot.hasError) {
               // If there was an error in loading the app data, show an error screen.
               child =

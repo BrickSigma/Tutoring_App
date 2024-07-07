@@ -31,15 +31,18 @@ class _RegisterState extends State<Register> {
   void registerUser(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       try {
-        UserCredential user = await FirebaseAuth.instance
+        UserCredential credential = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(
                 email: emailController.text, password: passwordController.text);
         await FirebaseDatabase.instance.ref().update({
-          "users/${user.user!.uid}": {
+          "users/${credential.user!.uid}": {
             "name": usernameController.text,
             "tutor": isTutor
           }
         });
+        await FirebaseDatabase.instance
+            .ref("users/${credential.user!.uid}")
+            .keepSynced(true);
         if (context.mounted) {
           showDialog(
             context: context,
