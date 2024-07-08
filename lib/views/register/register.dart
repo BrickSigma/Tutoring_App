@@ -2,6 +2,8 @@ import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:tutoring_app/main.dart';
+import 'package:tutoring_app/views/login/login.dart';
 
 class Register extends StatefulWidget {
   const Register({required ValueNotifier pageIndex, super.key})
@@ -44,19 +46,7 @@ class _RegisterState extends State<Register> {
             .ref("users/${credential.user!.uid}")
             .keepSynced(true);
         if (context.mounted) {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text("User created!"),
-              content: const Text("Go back to login..."),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("Okay"),
-                ),
-              ],
-            ),
-          );
+          App.restartApp(context);
         }
       } on FirebaseAuthException catch (e) {
         if (context.mounted) {
@@ -104,7 +94,7 @@ class _RegisterState extends State<Register> {
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios),
-          onPressed: () => widget._pageIndex.value = 0,
+          onPressed: () => widget._pageIndex.value = Login.index,
         ),
       ),
       body: Padding(

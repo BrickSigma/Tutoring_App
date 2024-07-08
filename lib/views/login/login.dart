@@ -2,6 +2,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:tutoring_app/main.dart';
 import 'package:tutoring_app/views/forgot_password/forgot_password.dart';
 import 'package:tutoring_app/views/register/register.dart';
 
@@ -30,9 +31,12 @@ class _LoginState extends State<Login> {
         UserCredential credentials = await FirebaseAuth.instance
             .signInWithEmailAndPassword(
                 email: emailController.text, password: passwordController.text);
-        FirebaseDatabase.instance
+        await FirebaseDatabase.instance
             .ref("users/${credentials.user!.uid}")
             .keepSynced(true);
+        if (context.mounted) {
+          App.restartApp(context);
+        }
       }
     } on FirebaseAuthException catch (e) {
       if (context.mounted) {

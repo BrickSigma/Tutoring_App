@@ -30,8 +30,11 @@ class App extends StatefulWidget {
   const App({super.key});
 
   /// Used to restart the app programatically.
-  static void restartApp(BuildContext context) {
-    context.findAncestorStateOfType<_AppState>()!.restartApp();
+  static void restartApp(BuildContext context) async {
+    await MainController.instance.clearAppData();
+    if (context.mounted) {
+      context.findAncestorStateOfType<_AppState>()!.restartApp();
+    }
   }
 
   @override

@@ -105,8 +105,12 @@ class MainController extends ChangeNotifier {
   }
 
   /// Clear all app data stored on shared preferences.
-  void clearAppData() async {
+  Future<void> clearAppData() async {
     /// Clear any variables here:
+    dataLoaded = false;
+    userId = null;
+    tasks.clear();
+    pageIndex.value = 0;
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();

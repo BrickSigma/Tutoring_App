@@ -16,7 +16,7 @@ class TasksController extends ChangeNotifier {
       (event) {
         tasks.clear();
         SplayTreeMap<String, dynamic> data =
-            SplayTreeMap.from(event.snapshot.value as Map);
+            SplayTreeMap.from((event.snapshot.value ?? {}) as Map);
         data.forEach((key, value) {
           tasks.add(Map<String, dynamic>.from(value as Map));
           notifyListeners();

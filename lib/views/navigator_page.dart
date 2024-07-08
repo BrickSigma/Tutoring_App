@@ -25,21 +25,20 @@ class NavigatorPage extends StatefulWidget {
 class _NavigatorPageState extends State<NavigatorPage> {
   /// Check if the user is already signed into the app.
   void setup() async {
-    FirebaseAuth.instance.authStateChanges().listen((User? user) async {
-      if (user == null) {
-        widget.pageIndex.value = Login.index;
-      } else {
-        final snapshot =
-            await FirebaseDatabase.instance.ref("users/${user.uid}").get();
-        if (snapshot.exists) {
-          if ((snapshot.value as Map)["tutor"]) {
-            widget.pageIndex.value = 3;
-          } else {
-            widget.pageIndex.value = 4;
-          }
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      widget.pageIndex.value = Login.index;
+    } else {
+      final snapshot =
+          await FirebaseDatabase.instance.ref("users/${user.uid}").get();
+      if (snapshot.exists) {
+        if ((snapshot.value as Map)["tutor"]) {
+          widget.pageIndex.value = 3;
+        } else {
+          widget.pageIndex.value = 4;
         }
       }
-    });
+    }
   }
 
   @override
