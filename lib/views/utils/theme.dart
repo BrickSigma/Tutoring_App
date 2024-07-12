@@ -73,11 +73,11 @@ ThemeData lightTheme = ThemeData(
       const FloatingActionButtonThemeData(shape: CircleBorder()),
   inputDecorationTheme: InputDecorationTheme(
     enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(12),
       borderSide: BorderSide(color: lightColorScheme.onPrimary),
     ),
     focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(12),
       borderSide: BorderSide(color: lightColorScheme.primary),
     ),
     fillColor: lightColorScheme.secondaryContainer,
@@ -138,11 +138,11 @@ ThemeData darkTheme = ThemeData(
   ),
   inputDecorationTheme: InputDecorationTheme(
     enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(12),
       borderSide: BorderSide(color: darkColorScheme.onPrimary),
     ),
     focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(12),
       borderSide: BorderSide(color: darkColorScheme.primary),
     ),
     fillColor: darkColorScheme.secondaryContainer,

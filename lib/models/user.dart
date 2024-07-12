@@ -44,17 +44,15 @@ class UserModel {
     if (_userData == null || uid == null) {
       name = "";
       tutor = false;
-      await FirebaseDatabase.instance.ref().keepSynced(false);
       return;
     }
-    await _userData!.keepSynced(true);
     final snapshot = await _userData!.get();
     if (snapshot.exists) {
       Map<String, dynamic> data = Map.from(snapshot.value as Map);
       name = data["name"];
       tutor = data["tutor"] as bool;
-      if (!tutor) {  // Load the data if the user is a studnet.
-        _loadTasks();
+      if (!tutor) {  // Load the data if the user is a student.
+        await _loadTasks();
       }
     } else {
       throw Exception("No data found for user!");

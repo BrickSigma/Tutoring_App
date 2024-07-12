@@ -4,6 +4,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:tutoring_app/views/student/home/home.dart';
 import 'package:tutoring_app/views/student/todo/todo_list_page.dart';
 
 /// Main navigator between app pages (home, todo list, timetable)
@@ -24,7 +25,7 @@ class _StudentPageState extends State<StudentPage> {
     /// Currently has empty containers to fill.
     final List<Widget> pages = <Widget>[
       const ToDoListPage(),
-      Container(color: Colors.green),
+      const Home(),
       Container(color: Colors.blue),
     ];
 
