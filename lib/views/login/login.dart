@@ -1,8 +1,8 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:tutoring_app/main.dart';
+import 'package:tutoring_app/models/user.dart';
 import 'package:tutoring_app/views/forgot_password/forgot_password.dart';
 import 'package:tutoring_app/views/register/register.dart';
 
@@ -26,51 +26,49 @@ class _LoginState extends State<Login> {
   final passwordController = TextEditingController();
 
   void login(BuildContext context) async {
-    try {
-      if (_formKey.currentState!.validate()) {
-        UserCredential credentials = await FirebaseAuth.instance
-            .signInWithEmailAndPassword(
-                email: emailController.text, password: passwordController.text);
-        await FirebaseDatabase.instance
-            .ref("users/${credentials.user!.uid}")
-            .keepSynced(true);
+    if (_formKey.currentState!.validate()) {
+      try {
+        await UserModel.loginUser(
+          emailController.text,
+          passwordController.text,
+        );
         if (context.mounted) {
           App.restartApp(context);
         }
-      }
-    } on FirebaseAuthException catch (e) {
-      if (context.mounted) {
-        String errorCode = "";
-        switch (e.code) {
-          case "user-disabled":
-            errorCode = "User disabled";
-            break;
-          case "user-not-found":
-            errorCode = "User not found";
-            break;
-          case "wrong-password":
-            errorCode = "Wrong password";
-            break;
-          case "invalid-email":
-            errorCode = "Invalid email";
-            break;
-          case "invalid-credential":
-            errorCode = "Invalid credential";
-            break;
+      } on FirebaseAuthException catch (e) {
+        if (context.mounted) {
+          String errorCode = "";
+          switch (e.code) {
+            case "user-disabled":
+              errorCode = "User disabled";
+              break;
+            case "user-not-found":
+              errorCode = "User not found";
+              break;
+            case "wrong-password":
+              errorCode = "Wrong password";
+              break;
+            case "invalid-email":
+              errorCode = "Invalid email";
+              break;
+            case "invalid-credential":
+              errorCode = "Invalid credential";
+              break;
+          }
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text("Could Not Login!"),
+              content: Text(errorCode),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Okay"),
+                ),
+              ],
+            ),
+          );
         }
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text("Could Not Login!"),
-            content: Text(errorCode),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("Okay"),
-              ),
-            ],
-          ),
-        );
       }
     }
   }

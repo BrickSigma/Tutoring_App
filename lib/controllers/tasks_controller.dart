@@ -10,7 +10,7 @@ class TasksController extends ChangeNotifier {
 
   TasksController(this.tasks) {
     FirebaseDatabase.instance
-        .ref("users/${MainController.instance.userId}/todo")
+        .ref("users/${MainController.instance.user.uid}/todo")
         .onValue
         .listen(
       (event) {
@@ -41,7 +41,7 @@ class TasksController extends ChangeNotifier {
 
   void saveTasks() async {
     DatabaseReference ref = FirebaseDatabase.instance
-        .ref("users/${MainController.instance.userId}/todo");
+        .ref("users/${MainController.instance.user.uid}/todo");
     int i = 0;
     Map<String, dynamic> data = {};
     for (Map<String, dynamic> task in tasks) {

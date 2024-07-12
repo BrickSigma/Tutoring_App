@@ -11,7 +11,7 @@ class ToDoListPage extends StatefulWidget {
 
 class ToDoListPageState extends State<ToDoListPage> {
   final TasksController controller =
-      TasksController(MainController.instance.tasks);
+      TasksController(MainController.instance.user.tasks);
 
   final TextEditingController _textController = TextEditingController();
 

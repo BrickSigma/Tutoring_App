@@ -1,8 +1,8 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:tutoring_app/main.dart';
+import 'package:tutoring_app/models/user.dart';
 import 'package:tutoring_app/views/login/login.dart';
 
 class Register extends StatefulWidget {
@@ -33,18 +33,8 @@ class _RegisterState extends State<Register> {
   void registerUser(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       try {
-        UserCredential credential = await FirebaseAuth.instance
-            .createUserWithEmailAndPassword(
-                email: emailController.text, password: passwordController.text);
-        await FirebaseDatabase.instance.ref().update({
-          "users/${credential.user!.uid}": {
-            "name": usernameController.text,
-            "tutor": isTutor
-          }
-        });
-        await FirebaseDatabase.instance
-            .ref("users/${credential.user!.uid}")
-            .keepSynced(true);
+        await UserModel.createUser(
+            emailController.text, passwordController.text, usernameController.text, isTutor);
         if (context.mounted) {
           App.restartApp(context);
         }

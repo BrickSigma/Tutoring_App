@@ -1,12 +1,10 @@
 /// Contains home controller for all app data.
 library;
 
-import 'dart:collection';
-
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tutoring_app/models/user.dart';
 
 /// Controller for the main app.
 ///
@@ -24,10 +22,7 @@ class MainController extends ChangeNotifier {
   /// Page index used to switch between login, tutor, and student pages.
   ValueNotifier<int> pageIndex = ValueNotifier(0);
 
-  /// List of tasks for student's todo list.
-  final List<Map<String, dynamic>> tasks = [];
-
-  String? userId;
+  UserModel user = UserModel(uid: null);
 
   /// Theme mode to use.
   ///
@@ -58,20 +53,16 @@ class MainController extends ChangeNotifier {
 
     final prefs = await SharedPreferences.getInstance();
 
-    /// Load any data from FIREBASE here
+    /// Load any data from Firebase here
     /// ==========================================
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      userId = user.uid;
-      final snapshot =
-          await FirebaseDatabase.instance.ref("users/${user.uid}").get();
-      if (snapshot.exists) {
-        if ((snapshot.value as Map)["tutor"]) {
-          pageIndex.value = 3;
-        } else {
-          pageIndex.value = 4;
-          await loadTasks();
-        }
+      this.user = UserModel(uid: user.uid);
+      await this.user.initialize();
+      if (this.user.isTutor()) {
+        pageIndex.value = 3;
+      } else {
+        pageIndex.value = 4;
       }
     }
 
@@ -85,18 +76,6 @@ class MainController extends ChangeNotifier {
     return 0;
   }
 
-  Future<void> loadTasks() async {
-    DatabaseReference ref = FirebaseDatabase.instance.ref("users/$userId/todo");
-    final snapshot = await ref.get();
-    if (snapshot.exists) {
-      SplayTreeMap<String, dynamic> data =
-          SplayTreeMap.from(snapshot.value as Map);
-      data.forEach((key, value) {
-        tasks.add(Map<String, dynamic>.from(value as Map));
-      });
-    }
-  }
-
   /// Used to save the theme mode to disk.
   Future<void> _saveThemeMode() async {
     final prefs = await SharedPreferences.getInstance();
@@ -108,8 +87,8 @@ class MainController extends ChangeNotifier {
   Future<void> clearAppData() async {
     /// Clear any variables here:
     dataLoaded = false;
-    userId = null;
-    tasks.clear();
+    user = UserModel(uid: null);
+    await user.initialize();
     pageIndex.value = 0;
 
     final prefs = await SharedPreferences.getInstance();
