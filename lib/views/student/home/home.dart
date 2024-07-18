@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tutoring_app/views/student/home/search.dart';
+import 'package:tutoring_app/views/student/home/settings.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -24,7 +25,13 @@ class _HomeState extends State<Home> {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const Settings(),
+                  ));
+            },
             icon: const Icon(Icons.settings),
           ),
         ],
