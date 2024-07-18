@@ -27,7 +27,7 @@ class _HomeState extends State<Home> {
             ),
             icon: Icon(MainController.instance.user.requests.isNotEmpty
                 ? Icons.notifications_active
-                : Icons.notifications),
+                : Icons.notifications_outlined),
           ),
           IconButton(
             onPressed: () {
