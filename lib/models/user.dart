@@ -12,9 +12,24 @@ class UserModel {
   bool tutor = false;
   DatabaseReference? _userData;
 
+  /// STUDENT RELATED DATA
+  /// ======================================
+
   /// List of tasks for student's todo list.
   final List<Map<String, dynamic>> tasks = [];
 
+  // List of tutors assigned to student.
+  List<String> tutors = [];
+
+  /// TUTOR RELATED DATA
+  /// ======================================
+
+  /// List of student requests
+  List<String> requests = [];
+
+  /// List of students accepted by tutor
+  List<String> students = [];
+  
   UserModel({required this.uid}) {
     _userData = FirebaseDatabase.instance.ref("users/$uid");
   }
@@ -51,8 +66,11 @@ class UserModel {
       Map<String, dynamic> data = Map.from(snapshot.value as Map);
       name = data["name"];
       tutor = data["tutor"] as bool;
-      if (!tutor) {  // Load the data if the user is a student.
+      if (!tutor) {
+        // Load the data if the user is a student.
         await _loadTasks();
+        // Load the tutors list
+        await _loadTutors();
       }
     } else {
       throw Exception("No data found for user!");
@@ -69,6 +87,14 @@ class UserModel {
       data.forEach((key, value) {
         tasks.add(Map<String, dynamic>.from(value as Map));
       });
+    }
+  }
+
+  Future<void> _loadTutors() async {
+    DatabaseReference ref = FirebaseDatabase.instance.ref("users/$uid/tutors");
+    final snapshot = await ref.get();
+    if (snapshot.exists) {
+      tutors = List.from((snapshot.value ?? []) as List);
     }
   }
 }

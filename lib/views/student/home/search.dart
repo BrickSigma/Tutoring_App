@@ -1,5 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:tutoring_app/controllers/main_controller.dart';
 
 class SearchResults extends StatefulWidget {
   const SearchResults(this.search, {super.key});
@@ -12,7 +13,11 @@ class SearchResults extends StatefulWidget {
 
 class _SearchResultsState extends State<SearchResults> {
   List<Widget> searchCards = [];
+  Key key = UniqueKey();
 
+  void update() => setState(() => key = UniqueKey());
+
+  /// Used to search for tutors using the subject they teach.
   Future<int> searchTutors() async {
     final snapshot = await FirebaseDatabase.instance.ref("users").get();
     searchCards.clear();
@@ -23,7 +28,19 @@ class _SearchResultsState extends State<SearchResults> {
           List<String> subjects = List.from((value["subjects"] ?? []) as List);
           for (String subject in subjects) {
             if (subject.toLowerCase().contains(widget.search.toLowerCase())) {
-              searchCards.add(SearchCard(key, value["name"], subjects));
+              List<String> tutorRequests =
+                  List.from((value["requests"] ?? []) as List);
+              int connectionType = 0;
+
+              // Check if the user has already sent a request to the tutor before
+              if (tutorRequests.contains(MainController.instance.user.uid)) {
+                connectionType = 1;
+              } else if (MainController.instance.user.tutors.contains(key)) {
+                // Check if the tutor is already connected with the student.
+                connectionType = 2;
+              }
+              searchCards.add(SearchCard(
+                  key, value["name"], subjects, connectionType, update));
               break;
             }
           }
@@ -42,6 +59,7 @@ class _SearchResultsState extends State<SearchResults> {
     );
 
     return FutureBuilder(
+      key: key,
       future: search,
       builder: (context, snapshot) {
         Widget child;
@@ -69,14 +87,54 @@ class _SearchResultsState extends State<SearchResults> {
 }
 
 class SearchCard extends StatelessWidget {
-  const SearchCard(this.uid, this.name, this.subjects, {super.key});
+  const SearchCard(
+      this.uid, this.name, this.subjects, this.connectionType, this.update,
+      {super.key});
 
   final String uid;
   final String name;
   final List<String> subjects;
+  final Function() update;
+
+  /// `0`: the student has never sent a request to the tutor
+  ///
+  /// `1`: the student has sent a pending request to the tutor
+  ///
+  /// `2`: the tutor is already connected with the student
+  final int connectionType;
 
   @override
   Widget build(BuildContext context) {
+    late Widget requestButton;
+
+    if (connectionType == 0) {
+      requestButton = TextButton(
+        onPressed: () async {
+          DatabaseReference ref =
+              FirebaseDatabase.instance.ref("users/$uid/requests");
+          final snapshot = await ref.get();
+          List<String> requests = [];
+          if (snapshot.exists) {
+            requests = List.from((snapshot.value ?? []) as List);
+          }
+          requests.add(MainController.instance.user.uid!);
+          await ref.set(requests);
+          update();
+        },
+        child: const Text("Send request"),
+      );
+    } else if (connectionType == 1) {
+      requestButton = const Text(
+        "Request Pending",
+        style: TextStyle(color: Colors.orange),
+      );
+    } else {
+      requestButton = const Text(
+        "Accepted",
+        style: TextStyle(color: Colors.green),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.all(6),
       child: Container(
@@ -88,7 +146,13 @@ class SearchCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(name),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(name),
+                  requestButton,
+                ],
+              ),
               const SizedBox(height: 12),
               SizedBox(
                 height: 48,

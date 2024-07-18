@@ -25,10 +25,6 @@ class _HomeState extends State<Home> {
         actions: [
           IconButton(
             onPressed: () {},
-            icon: const Icon(Icons.notifications),
-          ),
-          IconButton(
-            onPressed: () {},
             icon: const Icon(Icons.settings),
           ),
         ],
