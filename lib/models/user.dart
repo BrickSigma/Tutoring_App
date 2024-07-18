@@ -29,7 +29,7 @@ class UserModel {
 
   /// List of students accepted by tutor
   List<String> students = [];
-  
+
   UserModel({required this.uid}) {
     _userData = FirebaseDatabase.instance.ref("users/$uid");
   }
@@ -71,6 +71,8 @@ class UserModel {
         await _loadTasks();
         // Load the tutors list
         await _loadTutors();
+      } else {
+        await _loadTutorData();
       }
     } else {
       throw Exception("No data found for user!");
@@ -95,6 +97,20 @@ class UserModel {
     final snapshot = await ref.get();
     if (snapshot.exists) {
       tutors = List.from((snapshot.value ?? []) as List);
+    }
+  }
+
+  Future<void> _loadTutorData() async {
+    DatabaseReference ref =
+        FirebaseDatabase.instance.ref("users/$uid/requests");
+    DataSnapshot snapshot = await ref.get();
+    if (snapshot.exists) {
+      requests = List.from((snapshot.value ?? []) as List);
+    }
+    ref = FirebaseDatabase.instance.ref("users/$uid/students");
+    snapshot = await ref.get();
+    if (snapshot.exists) {
+      students = List.from((snapshot.value ?? []) as List);
     }
   }
 }

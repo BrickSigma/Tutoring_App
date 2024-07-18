@@ -10,6 +10,7 @@ import 'package:tutoring_app/views/forgot_password/forgot_password.dart';
 import 'package:tutoring_app/views/login/login.dart';
 import 'package:tutoring_app/views/register/register.dart';
 import 'package:tutoring_app/views/student/student_page.dart';
+import 'package:tutoring_app/views/tutor/tutor_page.dart';
 
 /// Main navigator between app pages (home, todo list, timetable)
 class NavigatorPage extends StatefulWidget {
@@ -50,7 +51,7 @@ class _NavigatorPageState extends State<NavigatorPage> {
       Login(pageIndex: widget.pageIndex), // Login
       Register(pageIndex: widget.pageIndex), // Register
       ForgotPassword(pageIndex: widget.pageIndex), // Forgot password
-      Container(color: Colors.amber), // Tutor
+      const TutorPage(), // Tutor
       const StudentPage(), // Student
     ];
 
