@@ -98,8 +98,12 @@ class TimetableController extends ChangeNotifier {
     await ref.set(timetable);
 
     // Add the timeblock for the student's timetable.
-    timeBlock["uid"] = MainController.instance.user.uid!;
-    timeBlock["name"] = MainController.instance.user.name;
+    Map<String, String> studentTimeBlock = {
+      "uid": MainController.instance.user.uid!,
+      "name": MainController.instance.user.name,
+      "start": start.toStringSeconds(),
+      "duration": duration.toStringSeconds(),
+    };
     List<List<Map<String, String>>> studentTimetable = [];
     ref = FirebaseDatabase.instance.ref("users/$uid/timetable");
     DataSnapshot snapshot = await ref.get();
@@ -121,7 +125,7 @@ class TimetableController extends ChangeNotifier {
         ]);
       }
     }
-    studentTimetable[dayNo].add(timeBlock);
+    studentTimetable[dayNo].add(studentTimeBlock);
     await ref.set(studentTimetable);
   }
 
@@ -145,8 +149,12 @@ class TimetableController extends ChangeNotifier {
     await ref.set(timetable);
 
     // Remove the timeblock from the student's timetable.
-    timeBlock["uid"] = MainController.instance.user.uid!;
-    timeBlock["name"] = MainController.instance.user.name;
+    Map<String, String> studentTimeBlock = {
+      "uid": MainController.instance.user.uid!,
+      "name": MainController.instance.user.name,
+      "start": start.toStringSeconds(),
+      "duration": duration.toStringSeconds(),
+    };
     List<List<Map<String, String>>> studentTimetable = [];
     ref = FirebaseDatabase.instance.ref("users/$uid/timetable");
     DataSnapshot snapshot = await ref.get();
@@ -169,9 +177,9 @@ class TimetableController extends ChangeNotifier {
       }
     }
     studentTimetable[dayNo].removeWhere(
-      (element) => (element["uid"] == timeBlock["uid"] &&
-          element["start"] == timeBlock["start"] &&
-          element["duration"] == timeBlock["duration"]),
+      (element) => (element["uid"] == studentTimeBlock["uid"] &&
+          element["start"] == studentTimeBlock["start"] &&
+          element["duration"] == studentTimeBlock["duration"]),
     );
     await ref.set(studentTimetable);
   }

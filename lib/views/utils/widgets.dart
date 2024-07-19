@@ -49,3 +49,17 @@ Future<T?> showAlertDialogue<T>(
     );
   }
 }
+
+/// Used to show bottom modal sheet, used in data input for subjects, timetables, etc...
+Future<T> showBottomInputSheet<T>(
+    {required BuildContext context, required Widget child}) async {
+  return await showModalBottomSheet(
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadiusDirectional.vertical(top: Radius.circular(20)),
+    ),
+    isScrollControlled: true,
+    context: context,
+    backgroundColor: Theme.of(context).colorScheme.surface,
+    builder: (context) => child,
+  );
+}

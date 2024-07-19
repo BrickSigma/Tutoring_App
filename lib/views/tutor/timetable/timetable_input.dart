@@ -76,7 +76,7 @@ class _TimetableInputState extends State<TimetableInput> {
                         // Remove the old timeblock before editing it.
                         if (_isEditing()) {
                           widget.controller.timetable[widget.timeBlockDayNo!]
-                              .retainWhere((element) =>
+                              .removeWhere((element) =>
                                   (element["uid"] == widget.timeBlock!["uid"] &&
                                       element["start"] ==
                                           widget.timeBlock!["start"] &&
