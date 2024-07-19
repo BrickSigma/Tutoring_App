@@ -141,7 +141,7 @@ class RequestCard extends StatelessWidget {
                       if (snapshot.exists) {
                         tutors = List.from((snapshot.value ?? []) as List);
                       }
-                      tutors.add(uid);
+                      tutors.add(MainController.instance.user.uid!);
                       await ref.set(
                           tutors); // Add the student ID to the students list
                       update();

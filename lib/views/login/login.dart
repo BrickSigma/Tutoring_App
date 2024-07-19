@@ -111,7 +111,7 @@ class _LoginState extends State<Login> {
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return "No password enetered!";
+                    return "No password entered!";
                   }
                   return null;
                 },
