@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tutoring_app/views/student/home/home.dart';
 import 'package:tutoring_app/views/student/todo/todo_list_page.dart';
+import 'package:tutoring_app/views/student/timetable/timetable_page.dart';
 
 /// Main navigator between app pages (home, todo list, timetable)
 class StudentPage extends StatefulWidget {
@@ -26,7 +27,7 @@ class _StudentPageState extends State<StudentPage> {
     final List<Widget> pages = <Widget>[
       const ToDoListPage(),
       const Home(),
-      Container(color: Colors.blue),
+      const TimetablePage()
     ];
 
     // Colors used for system UI.
